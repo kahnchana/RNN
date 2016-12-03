@@ -9,6 +9,9 @@ train.lua is the main file that runs it. The LSTM cell in LSTM.lua is directly t
 The utils contains code for setting cmd options and printing. 
 
 These links are helpful to understand the basic code blocks used: LSTM as cell, classNLLCriterion as loss function and some simple layers for connecting the inputs to the outputs. 
+
 https://github.com/jcjohnson/torch-rnn/blob/master/doc/modules.md (LSTM)
+
 https://github.com/torch/nn/blob/master/doc/criterion.md (classNLLCriterion)
+
 https://github.com/torch/nn/blob/master/doc/simple.md (view, linear)
