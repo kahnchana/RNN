@@ -15,21 +15,21 @@ local cmd = torch.CmdLine()
 
 -- Model options
 cmd:option('-dropout', 0.5)
-cmd:option('-seqLength', 8)
+cmd:option('-seqLength', 59)
 cmd:option('-lstmHidden', 256)
 
 -- Model options
 cmd:option('-numClasses', 1)
 
 -- Optimization options
-cmd:option('-numEpochs', 50)
-cmd:option('-learningRate', 1e-6)
+cmd:option('-numEpochs', 20)
+cmd:option('-learningRate', 1e-2)
 cmd:option('-lrDecayFactor', 0.5)
 cmd:option('-lrDecayEvery', 5)
 
 -- Output options
 cmd:option('-printEvery', 1) -- Print the loss after every n epochs
-cmd:option('-checkpointEvery', 100) -- Save model, print train acc
+cmd:option('-checkpointEvery', 10) -- Save model, print train acc
 cmd:option('-checkpointName', 'checkpoints/checkpoint') -- Save model
 
 -- Backend options
@@ -58,7 +58,7 @@ end
 utils.printTime("Initializing LSTM")
 local model = lstm_init(opt):type(opt.dtype)
 local criterion = nn.ClassNLLCriterion():type(opt.dtype)
-local data,labels=genData()
+local data,labels,x_test,y_test=getData('x_train_1.mat','y_train_1.mat','x_test_1.mat','y_test_1.mat')
 
 --[[
   Input:
@@ -152,14 +152,15 @@ function train(model)
       checkpoint.model = model
       torch.save(filename, checkpoint)
 
-      -- Cast model back so that it can continue to beu sed
+      -- Cast model back so that it can continue to be used
       model:type(opt.dtype)
       params, gradParams = model:getParameters()
       utils.printTime("Saved checkpoint model and opt at %s" % filename)
       collectgarbage()
     end
     end
-  utils.printTime("Finished training")  
+  utils.printTime("Finished training")
+  return model  
   end
 
   
@@ -217,20 +218,20 @@ function test(model, split, task)
         table.insert(evalData.trueLabels, batch.labels[i])
       end
     elseif task == 'detection' then
-      local numData = batch:size()
-      local scores = model:forward(batch.data)
+      local numData = 459
+      local scores = model:forward(x_test)
 
       for i = 1, numData do
         local videoFrameScores = scores[i]
         local _, predictedLabel = torch.max(videoFrameScores, 1)
         table.insert(evalData.predictedLabels, predictedLabel[1])
-        table.insert(evalData.trueLabels, batch.labels[i])
+        table.insert(evalData.trueLabels, y_test[i])
       end
     else
-      local numData = batch:size()
-      local scores = model:forward(batch.data)
+      local numData = data:size()[1]
+      local scores = model:forward(data)
 
-      evalData.loss = evalData.loss + criterion:forward(scores, batch.labels)
+      evalData.loss = evalData.loss + criterion:forward(scores, labels)
       evalData.numBatches = evalData.numBatches + 1
     end
 
