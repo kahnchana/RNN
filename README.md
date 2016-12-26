@@ -55,10 +55,13 @@ So first all the vectors were turned into size 59X1000. The max time steps were 
 This is needed because our batch size is greater than one. If we don't do this, we have to use a batch size of one. I have used normal gradient descent, using the entire batch at once (we have only around a 1000 cases and error falls down fast). 
 
 The dataset had 1531 videos; 1072 are taken for training and 459 for testing. 
-The x_train is made of size 1531x59x1000.
-The y_train is made of size 1531 (the loss function used require 1-D tensors: this is not supported in matlab, so reshaped on torch).
+The x_train is made of size 1072x59x1000.
+The y_train is made of size 1072 (the loss function used requires 1-D tensors: this is not supported in matlab, so reshaped on torch).
 The x_test is made of size 459x59x1000.
 The y_test is made of size 459.
 
-This is fed into the database using a function in rand_data.lua. The data given for this are four matrices of size 1531x59x1000 (x_train), 1531x1 (y_train), 459x59x1000 (x_test) and 459x1 (y_test). These are in .mat format. These should be input to the function getData in rand_data.lua. 
+This is fed into the database using a function in rand_data.lua. The data given for this are four matrices of size 1072x59x1000 (x_train), 1072x1 (y_train), 459x59x1000 (x_test) and 459x1 (y_test). These are in .mat format. These should be input to the function getData in rand_data.lua. 
+
+Also, when running the test, the x_test tensor is expanded to size 1072x59x1000 (from 459x59x1000). The additional cells can be filled with anything since they're not used. This is done because the RNN model is shaped to take in data of size 1072x59x1000. It's easier to just resize this and discard additional data instead of resizing entire RNN (which has to be done after training: so I'm not sure how to do this without affecting the trained weights). 
+
 
