@@ -31,12 +31,19 @@ You should get the accuracy. But the accuracy keeps coming as zero. I can't figu
 Dependencies:
 
 Before running the files, these dependencies must be installed.
+
 luarocks install torch
+
 luarocks install nn
+
 luarocks install optim
+
 luarocks install image
 
+
 sudo apt-get install libmatio2
+
 luarocks install matio
+
 
 Simply type in each of the lines above into the terminal in linux to get these installed. 
