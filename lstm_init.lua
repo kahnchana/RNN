@@ -26,9 +26,9 @@ function lstm_init(kwargs)
   end
   model:add(nn.View(-1, lstm.numHidden))
   model:add(nn.Linear(lstm.numHidden, numClasses))
-  model:add(nn.View(20,8))
+  model:add(nn.View(1072,59))
   model:add(nn.Linear(seqLength, numClasses))
-  model:add(nn.View(20))
+  model:add(nn.View(1072))
   model:add(nn.LogSoftMax())
 
   return model
