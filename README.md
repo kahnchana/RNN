@@ -19,9 +19,12 @@ How to run:
 
 1) Download the data : about 120MB
    (four matlab matrices; these are only for training on biking videos; y matrices have 1-negative,2-positive)  
+   
 2) Install dependencies for torch  
-3) Run train.lua
-4) Run test.lua -checkpoint checkpoints/checkpoint_final.t7
+
+3) Run in terminal: train.lua
+
+4) Run in terminal: test.lua -checkpoint checkpoints/checkpoint_final.t7
 
 You should get the accuracy. But the accuracy keeps coming as zero. I can't figure out whats wrong. 
 
