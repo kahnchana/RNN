@@ -15,7 +15,7 @@ https://github.com/jcjohnson/torch-rnn/blob/master/doc/modules.md (LSTM)
 https://github.com/torch/nn/blob/master/doc/criterion.md (classNLLCriterion)
 https://github.com/torch/nn/blob/master/doc/simple.md (view, linear)
 
-How to run:
+## How to run:
 
 1) Download the data : about 120MB
    (four matlab matrices; these are only for training on biking videos; y matrices have 1-negative,2-positive)  
@@ -28,7 +28,7 @@ How to run:
 
 You should get the accuracy. But the accuracy keeps coming as zero. I can't figure out whats wrong. 
 
-Dependencies:
+## Dependencies:
 
 Before running the files, these dependencies must be installed.
 
@@ -47,3 +47,18 @@ luarocks install matio
 
 
 Simply type in each of the lines above into the terminal in linux to get these installed. 
+
+
+## DATA Preprocessing
+
+So first all the vectors were turned into size 59X1000. The max time steps were 59. So the others were filled with 0s to make the same size. This has been done in other cases. https://github.com/fchollet/keras/issues/85
+This is needed because our batch size is greater than one. If we don't do this, we have to use a batch size of one. I have used normal gradient descent, using the entire batch at once (we have only around a 1000 cases and error falls down fast). 
+
+The dataset had 1531 videos; 1072 are taken for training and 459 for testing. 
+The x_train is made of size 1531x59x1000.
+The y_train is made of size 1531 (the loss function used require 1-D tensors: this is not supported in matlab, so reshaped on torch).
+The x_test is made of size 459x59x1000.
+The y_test is made of size 459.
+
+This is fed into the database using a function in rand_data.lua. The data given for this are four matrices of size 1531x59x1000 (x_train), 1531x1 (y_train), 459x59x1000 (x_test) and 459x1 (y_test). These are in .mat format. These should be input to the function getData in rand_data.lua. 
+
