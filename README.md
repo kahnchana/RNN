@@ -156,11 +156,13 @@ The linear layer combining all hidden states of LSTM was omitted, and the final 
 
 *did not converge
 
-Finally multi-class training was also carried out. This was done for the 28 dataset. Initally 20 time-steps were considered and training was done. The model was trained until it fit the training set upto 98.75% (convergence stopped at this point). An accuracy of 60.0% was recorded.  
+Finally multi-class training was also carried out. This was done for the 28 dataset. Initally 20 time-steps were considered and training was done. The model was trained until it fit the training set upto 98.75% (convergence stopped at this point). An accuracy of 60.0% was recorded. 
+Next, the same was carried out considering 59 time-steps. Training was done until model fit training data 95.42% (convergence stopped afterwards). An accuracy of 62.826 was recorded. 
 
 | Class         | 28        |
 | ------------- |:---------:| 
-| all classes   | 60.0      | 
+| 20 time-steps | 60.000    | 
+| 59 time-steps | 62.826    | 
 
 
 ## References
