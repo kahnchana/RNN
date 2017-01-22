@@ -13,7 +13,7 @@ local unpack = unpack or table.unpack
 local cmd = torch.CmdLine()
 
 -- Options
-cmd:option('-checkpoint', 'checkpoint_final.t7')
+cmd:option('-checkpoint', 'checkpoints/checkpoint_final.t7')
 cmd:option('-split', 'test')
 
 local opt = cmd:parse(arg)
@@ -32,26 +32,19 @@ utils.printTime("Initializing model")
 local checkpoint = torch.load(opt.checkpoint)
 local model = checkpoint.model
 model:type(opt.dtype)
-local criterion = nn.ClassNLLCriterion():type(opt.dtype)
+local criterion = nn.CrossEntropyCriterion():type(opt.dtype)
+criterion.nll.sizeAverage = false
 
 --[[
 	Inputs:
 		- model: an LSTM
 		- split: 'train', 'val', or 'test'
-		- task: 'recognition', 'detection', or 'loss'
+		- task: 'detection', or 'loss'
 
-	Performs either action recognition accuracy, action detection accuracy, or 
-	loss for a split based on what task the user inputs.
-
-  Action recognition is done by calculating the scores for each frame. The 
-  score for a video is the max of the average of its sequence of frames.
-
-  Action detection is done by calculating the scores for each frame and then 
-  getting the max score for each frame.
 ]]--
 
 function test(model, split, task)
-	assert(task == 'recognition' or task == 'detection' or task == 'loss')
+	assert(task == 'detection' or task == 'loss')
   collectgarbage()
   utils.printTime("Starting %s testing on the %s split" % {task, split})
 
@@ -61,8 +54,8 @@ function test(model, split, task)
   	evalData.trueLabels = {} -- true video or frame labels
   end
 
-  local x,y,data,labels=getData('x_train_1.mat','y_train_1.mat','x_test_1.mat','y_test_1.mat')
-
+  local data,labels,x,y=getData()
+    
     if opt.cuda == 1 then
       data = data:cuda()
       labels = labels:cuda()
@@ -70,28 +63,28 @@ function test(model, split, task)
 
 
 	  if task == 'detection' then
-	    local numData = 459
-	    local scores = model:forward(data)
-	    scores:resize(459) 
+	    numData = labels:size()[1]
+	    local scores = model:forward(data):exp()
+	    scores:resize(numData,11)
 
 	    for i = 1, numData do
-	      local predictedLabel = scores[i]
-	      --local _, predictedLabel = torch.max(videoFrameScores, 1)
+	      local _, predictedLabel = torch.max(scores[i],1)
+	      predictedLabel=predictedLabel[1]
+	      utils.printTime("%d       %d" %{predictedLabel,labels[i]})
 	      table.insert(evalData.predictedLabels, predictedLabel)
 	      table.insert(evalData.trueLabels, labels[i])
 	    end
 	  end
 
 
-  if task == 'recognition' or task == 'detection' then
-  	  evalData.predictedLabels = torch.round(torch.Tensor(evalData.predictedLabels))
+  if task == 'detection' then
+  	  evalData.predictedLabels = torch.Tensor(evalData.predictedLabels)
 	  evalData.trueLabels = torch.Tensor(evalData.trueLabels)
-	  return torch.sum(torch.eq(evalData.predictedLabels,evalData.trueLabels))/459 --evalData.predictedLabels:size()[1]
-
+	  return torch.sum(torch.eq(evalData.predictedLabels,evalData.trueLabels))/numData*100
   end
+
 end
 
 local testDetectionAcc = test(model, 'test', 'detection')
 utils.printTime("Action detection accuracy on the test set: %f" % testDetectionAcc)
---local testRecognitionAcc = test(model, 'test', 'recognition')
---utils.printTime("Action recognition accuracy on the test set: %f" % testRecognitionAcc)
+
