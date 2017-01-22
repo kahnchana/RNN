@@ -167,7 +167,7 @@ Finally multi-class training was also carried out. This was done for the 28 data
 
 Code was borrowed from the following libraries. 
 
-https://github.com/Element-Research/rnn/blob/master/LSTM.lua
-https://github.com/Element-Research/dataload
-https://github.com/jcjohnson/torch-rnn
-https://github.com/garythung/torch-lrcn
+* https://github.com/Element-Research/rnn/blob/master/LSTM.lua
+* https://github.com/Element-Research/dataload
+* https://github.com/jcjohnson/torch-rnn
+* https://github.com/garythung/torch-lrcn
