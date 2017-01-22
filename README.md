@@ -96,18 +96,76 @@ The architecture was based on the model used for activity recognition in https:/
 
 With regards to the Hollywood DataSet (11 classes), binary classification was initially carried out separately for each class. Afterwards, multi-class classification was done considering all classes. 
 
-For binary classification, three datasets were used: 28,46 & 82 (28 means 20% motion & 80% static vector components). For each dataset, training was done until model fit training data 99% or better.
+For binary classification, three datasets were used: 28,46 & 82 (28 means 20% motion & 80% static vector components). For each dataset, training was done until model fit training data 99% or better. The accuracies (correct cases percentage) are shown below. Training was done with 20 time-steps for training data. 
 
-| Tables        | Are           | Cool  |
-| ------------- |:-------------:| -----:|
-| col 3 is      | right-aligned | $1600 |
-| col 2 is      | centered      |   $12 |
-| zebra stripes | are neat      |    $1 |
+| Class         | 28        | 46    | 82    |
+| ------------- |:---------:| :----:| :---: |
+| biking        | 96.2      | 95.4  | 92.6  |
+| diving        | 93.1      | 93.1  | 89.6  |
+| golf          | 93.3      | 93.3  | 92.8  |
+| juggle        | 94.3      | 93.7  | 90.2  |
+| jumping       | 96.5      | 94.1  | 93.1  |
+| riding        | 96.1      | 95.7  | 90.2  |
+| shooting      | 91.7      | 90.4  | 91.9  |
+| spiking       | 94.5      | 93.9  | 93.0  |
+| swing         | 94.6      | 94.1  | 91.7  |
+| tennis        | 95.9      | 94.1  | 93.3  |
+| walk          | 96.1      | 95.7  | 91.9  |
+
+The best accuracies were seen for 28 (20% motion vector and 80% static vector). 
+
+Further testing was carried out using the 28 dataset. Next all time-steps present were used for training (59 time-steps). The accuracies are below. 
+
+| Class         | 28        |
+| ------------- |:---------:| 
+| biking        | 96.3      | 
+| diving        | 92.4      | 
+| golf          | 93.0      | 
+| juggle        | 95.2      | 
+| jumping       | 96.5      | 
+| riding        | 96.3      | 
+| shooting      | 91.9      | 
+| spiking       | 93.2      | 
+| swing         | 95.4      | 
+| tennis        | 95.9      | 
+| walk          | 96.3      | 
+
+Training was also carried out for a variant architecture. 
+
+nn.Sequential {
+  [input -> (1) -> (2) -> (3) -> (4) -> (5) -> (6) -> output]
+  (1): nn.LSTM(1000 -> 30)
+  (2): nn.Narrow
+  (3): nn.Transpose
+  (4): nn.View(-1, 30)
+  (5): nn.Dropout(0.600000)
+  (6): nn.Linear(30 -> 2)
+}
+
+The linear layer combining all hidden states of LSTM was omitted, and the final hidden state only was considered. This variant gave similar results to that with the linear layer. However convergence during training took somewhat longer for this model. It did not converge when training some classes. 20 time-steps were considered here.   
+
+| Class         | 28        |
+| ------------- |:---------:| 
+| biking        | 96.5      | 
+| diving        | 93.9      | 
+| golf          | 93.4      | 
+| juggle        | 92.4      | 
+| jumping       | *         | 
+| riding        | 97.4      | 
+| shooting      | 92.3      | 
+| spiking       | 93.4      | 
+| swing         | 95.      | 
+| tennis        | 95.      | 
+| walk          | 96.      | 
+
+Finally multi-class training was also carried out. This was done 
 
 
+## References
 
+Code was borrowed from the following libraries. 
 
-
-
-
-
+https://github.com/Element-Research/rnn/blob/master/LSTM.lua
+https://github.com/Element-Research/dataload
+https://github.com/jcjohnson/torch-rnn
+https://github.com/garythung/torch-lrcn
