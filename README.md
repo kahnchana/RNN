@@ -17,12 +17,9 @@ https://github.com/torch/nn/blob/master/doc/simple.md (view, linear, transpose)
 ## How to run:
 
 1) Download the data : about 120MB
-   (two matlab matrices. insert into a folder called data. folder data should be in same folder as the code.)  
-   
+   (two matlab matrices. insert into a folder called data. folder data should be in same folder as the code.) 
 2) Install dependencies for torch  
-
 3) Run in terminal: train.lua
-
 4) Run in terminal: test.lua -checkpoint checkpoints/checkpoint_final.t7
 
 You should get the accuracy.
@@ -31,19 +28,13 @@ You should get the accuracy.
 
 Before running the files, these dependencies must be installed.
 
-luarocks install torch
+*luarocks install torch
+*luarocks install nn
+*luarocks install optim
+*luarocks install image
 
-luarocks install nn
-
-luarocks install optim
-
-luarocks install image
-
-
-sudo apt-get install libmatio2
-
-luarocks install matio
-
+*sudo apt-get install libmatio2
+*luarocks install matio
 
 Simply type in each of the lines above into the terminal in linux to get these installed. 
 
