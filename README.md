@@ -1,12 +1,12 @@
 # RNN
 RNN will LSTM cells 
 
-This basically takes a set of sequences and classifies these sequences. 
+This basically takes a set of time-varying sequences and classifies these sequences. The sequence fed represents the motion and static vectors generated for the videos. 
 
-So the datasets (they're a little big) are on my drive. They can be accessed down here.
+So the preprocessed datasets I used are on my drive. They can be accessed down here.
 https://drive.google.com/drive/folders/0B0t3X5WMpC_BWjJIUHV2NUdvVFU?usp=sharing
 
-train.lua is the main file that runs it. The LSTM cell in LSTM.lua is directly taken from the model used in the paper we discussed. lstm_init.lua sets up the lstm according to the dataset size. rand_data.lua imports the data (it also has an option to generate random inputs and outputs). The utils contains code for setting cmd options and printing. 
+train.lua is the main file that runs it. test.lua runs on test cases. The LSTM cell in LSTM.lua is directly taken from the model used in the paper we discussed. lstm_init.lua sets up the lstm according to the dataset size. rand_data.lua imports the data (it also has an option to generate random inputs and outputs). The utils contains code for setting cmd options and printing. 
 
 These links are helpful to understand the basic code blocks used: LSTM as cell, CrossEntropyCriterion as loss function and some simple layers for connecting the inputs to the outputs. 
 
@@ -21,7 +21,7 @@ https://github.com/torch/nn/blob/master/doc/simple.md (view, linear, transpose)
 3) Run in terminal: train.lua
 4) Run in terminal: test.lua -checkpoint checkpoints/checkpoint_final.t7
 
-You should get the accuracy.
+For different classes, in rand_data.lua, line24 must be changed (equal to number of class). Also for multi-class, that line must be commented out, num-classes must be changed in train.lua and line68 in test.lua must be changed (scores:size=N x numClasses). 
 
 ## Dependencies:
 
@@ -34,8 +34,6 @@ Before running the files, these dependencies must be installed.
 
 * sudo apt-get install libmatio2
 * luarocks install matio
-
-Simply type in each of the lines above into the terminal in linux to get these installed. 
 
 
 ## DATA Preprocessing
@@ -78,7 +76,7 @@ nn.Sequential {
   
 }
 
-Inputs were matrices of size N x 20 x 1000. The LSTM was used to extract 30 features out of the 1x1000 time-varying variables. The output is of size N x 20 x 30. This output is reshaped into two dimensions to apply linear transforms. A dropout layer is used as a regularizor to avoid overfitting of data. 
+Inputs were matrices of size N x 20 x 1000. The LSTM was used to extract 30 features out of the 1x1000 time-varying variables. The output is of size N x 20 x 30. This output is reshaped into two dimensions to apply linear transforms. A dropout layer is used as a regularizor to avoid overfitting of data. (http://arxiv.org/abs/1207.0580)
 The first linear layer is used to extract data from the LSTM hidden states across time. The second is used to combine the features extracted from the 30 different LSTM cells. 
 CrossEntropyCritereon is used as the loss function during training. 
 
