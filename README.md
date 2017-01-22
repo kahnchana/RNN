@@ -135,6 +135,7 @@ nn.Sequential {
   * (4): nn.View(-1, 30)
   * (5): nn.Dropout(0.600000)
   * (6): nn.Linear(30 -> 2)
+  
 }
 
 The linear layer combining all hidden states of LSTM was omitted, and the final hidden state only was considered. This variant gave similar results to that with the linear layer. However convergence during training took somewhat longer for this model. It did not converge when training some classes. 20 time-steps were considered here.   
@@ -155,7 +156,11 @@ The linear layer combining all hidden states of LSTM was omitted, and the final 
 
 *did not converge
 
-Finally multi-class training was also carried out. This was done 
+Finally multi-class training was also carried out. This was done for the 28 dataset. Initally 20 time-steps were considered and training was done. The model was trained until it fit the training set upto 98.75% (convergence stopped at this point). An accuracy of 60.0% was recorded.  
+
+| Class         | 28        |
+| ------------- |:---------:| 
+| all classes   | 60.0      | 
 
 
 ## References
