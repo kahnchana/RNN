@@ -1,24 +1,23 @@
 # RNN
 RNN will LSTM cells 
 
-
-I've made inputs and trained on them. The code still has some bug. I get an accuracy of zero. Or perhaps I've messed up when pre-processing the datasets. 
+This basically takes a set of sequences and classifies these sequences. 
 
 So the datasets (they're a little big) are on my drive. They can be accessed down here.
 https://drive.google.com/drive/folders/0B0t3X5WMpC_BWjJIUHV2NUdvVFU?usp=sharing
 
 train.lua is the main file that runs it. The LSTM cell in LSTM.lua is directly taken from the model used in the paper we discussed. lstm_init.lua sets up the lstm according to the dataset size. rand_data.lua imports the data (it also has an option to generate random inputs and outputs). The utils contains code for setting cmd options and printing. 
 
-These links are helpful to understand the basic code blocks used: LSTM as cell, classNLLCriterion as loss function and some simple layers for connecting the inputs to the outputs. 
+These links are helpful to understand the basic code blocks used: LSTM as cell, CrossEntropyCriterion as loss function and some simple layers for connecting the inputs to the outputs. 
 
 https://github.com/jcjohnson/torch-rnn/blob/master/doc/modules.md (LSTM)
-https://github.com/torch/nn/blob/master/doc/criterion.md (classNLLCriterion)
-https://github.com/torch/nn/blob/master/doc/simple.md (view, linear)
+https://github.com/torch/nn/blob/master/doc/criterion.md (CrossEntropyCriterion)
+https://github.com/torch/nn/blob/master/doc/simple.md (view, linear, transpose)
 
 ## How to run:
 
 1) Download the data : about 120MB
-   (four matlab matrices; these are only for training on biking videos; y matrices have 1-negative,2-positive)  
+   (two matlab matrices. insert into a folder called data. folder data should be in same folder as the code.)  
    
 2) Install dependencies for torch  
 
@@ -26,7 +25,7 @@ https://github.com/torch/nn/blob/master/doc/simple.md (view, linear)
 
 4) Run in terminal: test.lua -checkpoint checkpoints/checkpoint_final.t7
 
-You should get the accuracy. But the accuracy keeps coming as zero. I can't figure out whats wrong. 
+You should get the accuracy.
 
 ## Dependencies:
 
@@ -54,14 +53,61 @@ Simply type in each of the lines above into the terminal in linux to get these i
 So first all the vectors were turned into size 59X1000. The max time steps were 59. So the others were filled with 0s to make the same size. This has been done in other cases. https://github.com/fchollet/keras/issues/85
 This is needed because our batch size is greater than one. If we don't do this, we have to use a batch size of one. I have used normal gradient descent, using the entire batch at once (we have only around a 1000 cases and error falls down fast). 
 
-The dataset had 1531 videos; 1072 are taken for training and 459 for testing. 
-The x_train is made of size 1072x59x1000.
-The y_train is made of size 1072 (the loss function used requires 1-D tensors: this is not supported in matlab, so reshaped on torch).
-The x_test is made of size 459x59x1000.
-The y_test is made of size 459.
+The dataset had 1532 videos; training and testing are split 7:3 (N:M)
+The x_train is made of size Nx59x1000.
+The y_train is made of size N (the loss function used requires 1-D tensors: this is not supported in matlab, so reshaped on torch).
+The x_test is made of size Mx59x1000.
+The y_test is made of size M.
 
-This is fed into the database using a function in rand_data.lua. The data given for this are four matrices of size 1072x59x1000 (x_train), 1072x1 (y_train), 459x59x1000 (x_test) and 459x1 (y_test). These are in .mat format. These should be input to the function getData in rand_data.lua. 
+This is fed into the database using a function in rand_data.lua. The data given for this are two matrices of data and labels. These are in .mat format. These should be input to the function getData in rand_data.lua. (already done in code)
 
-Also, when running the test, the x_test tensor is expanded to size 1072x59x1000 (from 459x59x1000). The additional cells can be filled with anything since they're not used. This is done because the RNN model is shaped to take in data of size 1072x59x1000. It's easier to just resize this and discard additional data instead of resizing entire RNN (which has to be done after training: so I'm not sure how to do this without affecting the trained weights). 
+Also, when running the test, the x_test tensor is expanded to size Nx59x1000 (from Mx59x1000). The additional cells can be filled with anything since they're not used. This is done because the RNN model is shaped to take in data of size Nx59x1000. It's easier to just resize this and discard additional data instead of resizing entire RNN (which has to be done after training: so I'm not sure how to do this without affecting the trained weights). 
+
+
+## Architecture
+
+Initially, 59 time steps were considered. However, 95% of the videos had below 20 time steps. So 20 time steps were considered afterwards, as this was computationally more efficient. 
+
+Also the accuracy on test data showed only a minor decrease of below 0.5% when timesteps beyond 20% are ommited. Therefore, 20 time-steps for inputs were considered.
+
+Also two layers of LSTM units were considered as well. However, in this case, the training would not converge for even an extended about of training cycles (twice the usual). So this was also not considered. 
+
+Thereafter,the architecture of the RNN used was as follows. 
+
+nn.Sequential {
+  [input -> (1) -> (2) -> (3) -> (4) -> (5) -> (6) -> (7) -> output]
+  (1): nn.LSTM(1000 -> 30)
+  (2): nn.Transpose
+  (3): nn.View(-1, 20)
+  (4): nn.Dropout(0.600000)
+  (5): nn.Linear(20 -> 1). 
+  (6): nn.View(-1, 30)
+  (7): nn.Linear(30 -> 2)
+}
+
+Inputs were matrices of size N x 20 x 1000. The LSTM was used to extract 30 features out of the 1x1000 time-varying variables. The output is of size N x 20 x 30. This output is reshaped into two dimensions to apply linear transforms. A dropout layer is used as a regularizor to avoid overfitting of data. 
+The first linear layer is used to extract data from the LSTM hidden states across time. The second is used to combine the features extracted from the 30 different LSTM cells. 
+CrossEntropyCritereon is used as the loss function during training. 
+
+The architecture was based on the model used for activity recognition in https://arxiv.org/pdf/1411.4389.pdf. Idees were also taken from this models used in https://arxiv.org/pdf/1303.5778v1.pdf and http://www.cs.utoronto.ca/~ilya/pubs/2011/LANG-RNN.pdf. 
+
+
+## Experiments
+
+With regards to the Hollywood DataSet (11 classes), binary classification was initially carried out separately for each class. Afterwards, multi-class classification was done considering all classes. 
+
+For binary classification, three datasets were used: 28,46 & 82 (28 means 20% motion & 80% static vector components). For each dataset, training was done until model fit training data 99% or better.
+
+| Tables        | Are           | Cool  |
+| ------------- |:-------------:| -----:|
+| col 3 is      | right-aligned | $1600 |
+| col 2 is      | centered      |   $12 |
+| zebra stripes | are neat      |    $1 |
+
+
+
+
+
+
 
 
