@@ -16,9 +16,8 @@ https://github.com/torch/nn/blob/master/doc/simple.md (view, linear, transpose)
 
 ## How to run:
 
-1) Download the data : about 120MB
-   (two matlab matrices. insert into a folder called data. folder data should be in same folder as the code.) 
-2) Install dependencies for torch  
+1) Download the data : about 120MB    (two matlab matrices. insert into a folder called data. folder data should be in same folder as the code.) 
+2) Install dependencies for torch
 3) Run in terminal: train.lua
 4) Run in terminal: test.lua -checkpoint checkpoints/checkpoint_final.t7
 
@@ -28,13 +27,13 @@ You should get the accuracy.
 
 Before running the files, these dependencies must be installed.
 
-*luarocks install torch
-*luarocks install nn
-*luarocks install optim
-*luarocks install image
+* luarocks install torch
+* luarocks install nn
+* luarocks install optim
+* luarocks install image
 
-*sudo apt-get install libmatio2
-*luarocks install matio
+* sudo apt-get install libmatio2
+* luarocks install matio
 
 Simply type in each of the lines above into the terminal in linux to get these installed. 
 
@@ -69,13 +68,14 @@ nn.Sequential {
 
   input -> (1) -> (2) -> (3) -> (4) -> (5) -> (6) -> (7) -> output
   
-  (1): nn.LSTM(1000 -> 30)
-  (2): nn.Transpose
-  (3): nn.View(-1, 20)
-  (4): nn.Dropout(0.600000)
-  (5): nn.Linear(20 -> 1). 
-  (6): nn.View(-1, 30)
-  (7): nn.Linear(30 -> 2)
+  * (1): nn.LSTM(1000 -> 30)
+  * (2): nn.Transpose
+  * (3): nn.View(-1, 20)
+  * (4): nn.Dropout(0.600000)
+  * (5): nn.Linear(20 -> 1)
+  * (6): nn.View(-1, 30)
+  * (7): nn.Linear(30 -> 2)
+  
 }
 
 Inputs were matrices of size N x 20 x 1000. The LSTM was used to extract 30 features out of the 1x1000 time-varying variables. The output is of size N x 20 x 30. This output is reshaped into two dimensions to apply linear transforms. A dropout layer is used as a regularizor to avoid overfitting of data. 
@@ -129,12 +129,12 @@ nn.Sequential {
 
   input -> (1) -> (2) -> (3) -> (4) -> (5) -> (6) -> output
   
-  (1): nn.LSTM(1000 -> 30)
-  (2): nn.Narrow
-  (3): nn.Transpose
-  (4): nn.View(-1, 30)
-  (5): nn.Dropout(0.600000)
-  (6): nn.Linear(30 -> 2)
+  * (1): nn.LSTM(1000 -> 30)
+  * (2): nn.Narrow
+  * (3): nn.Transpose
+  * (4): nn.View(-1, 30)
+  * (5): nn.Dropout(0.600000)
+  * (6): nn.Linear(30 -> 2)
 }
 
 The linear layer combining all hidden states of LSTM was omitted, and the final hidden state only was considered. This variant gave similar results to that with the linear layer. However convergence during training took somewhat longer for this model. It did not converge when training some classes. 20 time-steps were considered here.   
@@ -149,9 +149,11 @@ The linear layer combining all hidden states of LSTM was omitted, and the final 
 | riding        | 97.4      | 
 | shooting      | 92.3      | 
 | spiking       | 93.4      | 
-| swing         | 95.      | 
-| tennis        | 95.      | 
-| walk          | 96.      | 
+| swing         | 94.1      | 
+| tennis        | 95.8      | 
+| walk          | *         |
+
+*did not converge
 
 Finally multi-class training was also carried out. This was done 
 
