@@ -75,7 +75,9 @@ Also two layers of LSTM units were considered as well. However, in this case, th
 Thereafter,the architecture of the RNN used was as follows. 
 
 nn.Sequential {
-  [input -> (1) -> (2) -> (3) -> (4) -> (5) -> (6) -> (7) -> output]
+
+  input -> (1) -> (2) -> (3) -> (4) -> (5) -> (6) -> (7) -> output
+  
   (1): nn.LSTM(1000 -> 30)
   (2): nn.Transpose
   (3): nn.View(-1, 20)
@@ -94,7 +96,7 @@ The architecture was based on the model used for activity recognition in https:/
 
 ## Experiments
 
-With regards to the Hollywood DataSet (11 classes), binary classification was initially carried out separately for each class. Afterwards, multi-class classification was done considering all classes. 
+With regards to the YouTube DataSet (11 classes), binary classification was initially carried out separately for each class. Afterwards, multi-class classification was done considering all classes. 
 
 For binary classification, three datasets were used: 28,46 & 82 (28 means 20% motion & 80% static vector components). For each dataset, training was done until model fit training data 99% or better. The accuracies (correct cases percentage) are shown below. Training was done with 20 time-steps for training data. 
 
@@ -133,7 +135,9 @@ Further testing was carried out using the 28 dataset. Next all time-steps presen
 Training was also carried out for a variant architecture. 
 
 nn.Sequential {
-  [input -> (1) -> (2) -> (3) -> (4) -> (5) -> (6) -> output]
+
+  input -> (1) -> (2) -> (3) -> (4) -> (5) -> (6) -> output
+  
   (1): nn.LSTM(1000 -> 30)
   (2): nn.Narrow
   (3): nn.Transpose
