@@ -14,22 +14,22 @@ local unpack = unpack or table.unpack
 local cmd = torch.CmdLine()
 
 -- Model options
-cmd:option('-dropout', 0.5)
+cmd:option('-dropout', 0.6)
 cmd:option('-seqLength', 59)
-cmd:option('-lstmHidden', 256)
+cmd:option('-lstmHidden', 30)
 
 -- Model options
-cmd:option('-numClasses', 1)
+cmd:option('-numClasses', 11)
 
 -- Optimization options
-cmd:option('-numEpochs', 20)
+cmd:option('-numEpochs', 200)
 cmd:option('-learningRate', 1e-2)
 cmd:option('-lrDecayFactor', 0.5)
-cmd:option('-lrDecayEvery', 5)
+cmd:option('-lrDecayEvery', 25)
 
 -- Output options
 cmd:option('-printEvery', 1) -- Print the loss after every n epochs
-cmd:option('-checkpointEvery', 10) -- Save model, print train acc
+cmd:option('-checkpointEvery', 1000) -- Save model, print train acc
 cmd:option('-checkpointName', 'checkpoints/checkpoint') -- Save model
 
 -- Backend options
@@ -56,9 +56,12 @@ end
 
 -- Initialize model and criterion and data
 utils.printTime("Initializing LSTM")
-local model = lstm_init(opt):type(opt.dtype)
-local criterion = nn.ClassNLLCriterion():type(opt.dtype)
-local data,labels,x_test,y_test=getData('x_train_1.mat','y_train_1.mat','x_test_1.mat','y_test_1.mat')
+local model = lstm_init(opt):type(opt.dtype) --torch.load('checkpoints/checkpoint_final.t7').model:type(opt.dtype)  
+
+local criterion = nn.CrossEntropyCriterion():type(opt.dtype) --nn.ClassNLLCriterion()
+criterion.nll.sizeAverage = false
+
+local data,labels,x_test,y_test=getData()
 
 --[[
   Input:
@@ -91,6 +94,10 @@ function train(model)
     data = data:cuda()
     labels = labels:cuda()
     end
+    
+--    local dataSize=data:size()[1]
+--    for j=1,dataSize do
+    
 
     local function feval(x)
     collectgarbage()
@@ -105,6 +112,16 @@ function train(model)
         local frameLoss = criterion:forward(modelOut, labels)
         local gradOutputs = criterion:backward(modelOut, labels)
         local gradModel = model:backward(data, gradOutputs)
+        
+--[[
+	    for j=1,2 do
+        utils.printTime("%s,%s       %s      %s" %{modelOut[j][1],modelOut[j][2],labels[j],criterion:forward(modelOut, labels)}) --
+        end
+        
+        for j=1060,1062 do
+        utils.printTime("%s       %s      %s" %{modelOut[j],labels[j],criterion:forward(modelOut, labels)}) --
+        end
+]]--
 
         return frameLoss, gradParams
         end
@@ -113,7 +130,7 @@ function train(model)
     local _, loss = optim.adam(feval, params, config)
     
     table.insert(epochLoss, loss[1])
-          
+            
 
 
     local epochLoss = torch.mean(torch.Tensor(epochLoss))
@@ -123,9 +140,11 @@ function train(model)
     if (opt.printEvery > 0 and i % opt.printEvery == 0) then
       utils.printTime("Epoch %d training loss: %f" % {i, epochLoss})
     end
+    
+    local minLoss=10
 
     -- Save a checkpoint of the model, its opt parameters, the training loss history, and the validation loss history
-    if (opt.checkpointEvery > 0 and i % opt.checkpointEvery == 0) or i == opt.numEpochs then
+    if (opt.checkpointEvery > 0 and i % opt.checkpointEvery == 0) or i == opt.numEpochs or epochLoss<minLoss then
       local valLoss = test(model, 'val', 'loss')
       utils.printTime("Epoch %d validation loss: %f" % {i, valLoss})
       table.insert(valLossHistory, valLoss)
@@ -138,7 +157,7 @@ function train(model)
       }
 
       local filename
-      if i == opt.numEpochs then
+      if i == opt.numEpochs or epochLoss<minLoss then
         filename = '%s_%s.t7' % {opt.checkpointName, 'final'}
       else
         filename = '%s_%d.t7' % {opt.checkpointName, i}
@@ -158,7 +177,12 @@ function train(model)
       utils.printTime("Saved checkpoint model and opt at %s" % filename)
       collectgarbage()
     end
+    
+    if epochLoss<minLoss then
+    break
     end
+    
+    end 
   utils.printTime("Finished training")
   return model  
   end
@@ -170,80 +194,40 @@ function train(model)
 
 --[[
   Inputs:
-    - model: an LRCN
+    - model: an LSTM
     - split: 'train', 'val', or 'test'
-    - task: 'recognition', 'detection', or 'loss'
+    - task: 'detection', or 'loss'
 
-  Performs either action recognition accuracy, action detection accuracy, or 
-  loss for a split based on what task the user inputs.
-
-  Action recognition is done by calculating the scores for each frame. The 
-  score for a video is the max of the average of its sequence of frames.
-
-  Action detection is done by calculating the scores for each frame and then 
-  getting the max score for each frame.
+    Same code used in testing
 ]]--
 function test(model, split, task)
-  assert(task == 'recognition' or task == 'detection' or task == 'loss')
+  assert(task == 'detection' or task == 'loss')
   collectgarbage()
   utils.printTime("Starting %s testing on the %s split" % {task, split})
 
   local evalData = {}
-  if task == 'recognition' or task == 'detection' then
-    evalData.predictedLabels = {} -- predicted video or frame labels
-    evalData.trueLabels = {} -- true video or frame labels
-  else
-    evalData.loss = 0 -- sum of losses
-    evalData.numBatches = 0 -- total number of frames
-  end
+  evalData.loss = 0 -- sum of losses
+  evalData.numBatches = 0 -- total number of frames
 
 
-  while batch ~= nil do
-    if opt.cuda == 1 then
-      batch.data = batch.data:cuda()
-      batch.labels = batch.labels:cuda()
-    end
+--    if opt.cuda == 1 then
+--      data = data:cuda()
+--      labels = labels:cuda()
+--    end
 
-    if task == 'recognition' then
-      local numData = batch:size() / checkpoint.opt.seqLength
-      local scores = model:forward(batch.data)
 
-      for i = 1, numData do
-        local startIndex = (i - 1) * checkpoint.opt.seqLength + 1
-        local endIndex = i * checkpoint.opt.seqLength
-        local videoFrameScores = scores[{ {startIndex, endIndex}, {} }]
-        local videoScore = torch.sum(videoFrameScores, 1) / checkpoint.opt.seqLength
-        local maxScore, predictedLabel = torch.max(videoScore[1], 1)
-        table.insert(evalData.predictedLabels, predictedLabel[1])
-        table.insert(evalData.trueLabels, batch.labels[i])
-      end
-    elseif task == 'detection' then
-      local numData = 459
-      local scores = model:forward(x_test)
-
-      for i = 1, numData do
-        local videoFrameScores = scores[i]
-        local _, predictedLabel = torch.max(videoFrameScores, 1)
-        table.insert(evalData.predictedLabels, predictedLabel[1])
-        table.insert(evalData.trueLabels, y_test[i])
-      end
-    else
       local numData = data:size()[1]
       local scores = model:forward(data)
-
       evalData.loss = evalData.loss + criterion:forward(scores, labels)
       evalData.numBatches = evalData.numBatches + 1
-    end
 
-    batch = nil
-  end
 
   if task == 'recognition' or task == 'detection' then
     evalData.predictedLabels = torch.Tensor(evalData.predictedLabels)
     evalData.trueLabels = torch.Tensor(evalData.trueLabels)
     return torch.sum(torch.eq(evalData.predictedLabels, evalData.trueLabels)) / evalData.predictedLabels:size()[1]
   else
-    return evalData.loss / evalData.numBatches
+    return evalData.loss
   end
 end
 
