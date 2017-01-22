@@ -82,7 +82,7 @@ Inputs were matrices of size N x 20 x 1000. The LSTM was used to extract 30 feat
 The first linear layer is used to extract data from the LSTM hidden states across time. The second is used to combine the features extracted from the 30 different LSTM cells. 
 CrossEntropyCritereon is used as the loss function during training. 
 
-The architecture was based on the model used for activity recognition in https://arxiv.org/pdf/1411.4389.pdf. Idees were also taken from this models used in https://arxiv.org/pdf/1303.5778v1.pdf and http://www.cs.utoronto.ca/~ilya/pubs/2011/LANG-RNN.pdf. 
+The architecture was based on the model used for activity recognition in https://arxiv.org/pdf/1411.4389.pdf. Ideas were also taken from this models used in https://arxiv.org/pdf/1303.5778v1.pdf and http://www.cs.utoronto.ca/~ilya/pubs/2011/LANG-RNN.pdf. 
 
 
 ## Experiments
