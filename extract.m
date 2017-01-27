@@ -1,4 +1,4 @@
-cd 'E:\Machine Learning\DataSets\28' ; %change path for different file sets
+cd 'E:\Machine Learning\DataSets\58' ; %change path for different file sets
 x=[]; 
 y=[];
 a=dir('*.mat');
