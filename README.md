@@ -85,11 +85,13 @@ The architecture was based on the model used for activity recognition in https:/
 
 ## Experiments
 
-With regards to the YouTube DataSet (11 classes), binary classification was initially carried out separately for each class.  Afterwards, multi-class classification was done considering all classes. These two proccesses were carried out for two types of datasets: motion and static components combined using method 01 and method 02.
+With regards to the YouTube DataSet (11 classes), binary classification was initially carried out separately for each class.  Afterwards, multi-class classification was done considering all classes. These two proccesses were carried out for three types of datasets: motion and static components combined using method 01, method 02 and method 03.
 
 ### Binary Classification
 
-For binary classification, three datasets were used: 28,46 & 82 (28 means 20% motion & 80% static vector components). For each dataset, training was done until model fit training data 99% or better. The accuracies (correct cases percentage) are shown below. Training was done with 20 time-steps for training data. This is for method 01 data.
+#### Method 1
+
+For binary classification, three datasets were used: 28, 46, 64 & 82 (28 means 20% motion & 80% static vector components). For each dataset, training was done until model fit training data 99% or better. The accuracies (correct cases percentage) are shown below. Training was done with 20 time-steps for training data. This is for method 01 data.
 
 | Class         | 28        | 46    | 64    | 82    |
 | ------------- |:---------:| :----:| :---: | :---: |
@@ -156,6 +158,8 @@ The linear layer combining all hidden states of LSTM was omitted, and the final 
 
 *did not converge
 
+#### Method 2
+
 The first experiment was carried out for method 02 data as well. Time steps taken were 20 and model was fit to training data upto atleast 99%. 
 
 | Class         | 28        | 46    | 64    | 82    |
@@ -169,8 +173,26 @@ The first experiment was carried out for method 02 data as well. Time steps take
 | shooting      | 92.1      | 91.0  | 90.4  | 91.4  |
 | spiking       | 94.3      | 94.3  | 94.1  | 93.2  |
 | swing         | 94.9      | 93.0  | 93.0  | 91.9  |
-| tennis        | 95.9      | 95.4  | 93.6  | 93.4  |
 | walk          | 97.2      | 95.6  | 94.7  | 93.9  |
+
+
+#### Method 3 (PCA)
+
+The static and motion vectors were turned into one dimension using PCA. The results are below.
+
+| Class         | PCA       |
+| ------------- |:---------:| 
+| biking        | 96.5      | 
+| diving        | 93.9      | 
+| golf          | 93.4      | 
+| juggle        | 92.4      | 
+| jumping       | *         | 
+| riding        | 97.4      | 
+| shooting      | 92.3      | 
+| spiking       | 93.4      | 
+| swing         | 94.1      | 
+| tennis        | 95.8      | 
+| walk          | *         |
 
 
 ### Multi Class Classification
@@ -183,6 +205,19 @@ Next, the same was carried out considering 59 time-steps. Training was done unti
 | 20 time-steps | 60.000    | 
 | 59 time-steps | 62.826    | 
 
+The same was carried out for the method 02 data with same parameters. Model was fit upto 96.36% to training data.
+
+| Class         | 28        |
+| ------------- |:---------:| 
+| 20 time-steps | 53.478    | 
+| 59 time-steps | 58.043    | 
+
+It was also carried out for the method 03 data with same parameters. 
+
+| Class         | PCA       |
+| ------------- |:---------:| 
+| 20 time-steps | 53.478    | 
+| 59 time-steps | ------    | 
 
 ## References
 
