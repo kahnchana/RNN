@@ -85,23 +85,25 @@ The architecture was based on the model used for activity recognition in https:/
 
 ## Experiments
 
-With regards to the YouTube DataSet (11 classes), binary classification was initially carried out separately for each class. Afterwards, multi-class classification was done considering all classes. 
+With regards to the YouTube DataSet (11 classes), binary classification was initially carried out separately for each class.  Afterwards, multi-class classification was done considering all classes. These two proccesses were carried out for two types of datasets: motion and static components combined using method 01 and method 02.
 
-For binary classification, three datasets were used: 28,46 & 82 (28 means 20% motion & 80% static vector components). For each dataset, training was done until model fit training data 99% or better. The accuracies (correct cases percentage) are shown below. Training was done with 20 time-steps for training data. 
+### Binary Classification
 
-| Class         | 28        | 46    | 82    |
-| ------------- |:---------:| :----:| :---: |
-| biking        | 96.2      | 95.4  | 92.6  |
-| diving        | 93.1      | 93.1  | 89.6  |
-| golf          | 93.3      | 93.3  | 92.8  |
-| juggle        | 94.3      | 93.7  | 90.2  |
-| jumping       | 96.5      | 94.1  | 93.1  |
-| riding        | 96.1      | 95.7  | 90.2  |
-| shooting      | 91.7      | 90.4  | 91.9  |
-| spiking       | 94.5      | 93.9  | 93.0  |
-| swing         | 94.6      | 94.1  | 91.7  |
-| tennis        | 95.9      | 94.1  | 93.3  |
-| walk          | 96.1      | 95.7  | 91.9  |
+For binary classification, three datasets were used: 28,46 & 82 (28 means 20% motion & 80% static vector components). For each dataset, training was done until model fit training data 99% or better. The accuracies (correct cases percentage) are shown below. Training was done with 20 time-steps for training data. This is for method 01 data.
+
+| Class         | 28        | 46    | 64    | 82    |
+| ------------- |:---------:| :----:| :---: | :---: |
+| biking        | 96.2      | 95.4  | 94.1  | 92.6  |
+| diving        | 93.1      | 93.1  | 89.8  | 89.6  |
+| golf          | 93.3      | 93.3  | 92.2  | 92.8  |
+| juggle        | 94.3      | 93.7  | 92.8  | 90.2  |
+| jumping       | 96.5      | 94.1  | 94.1  | 93.1  |
+| riding        | 96.1      | 95.7  | 93.1  | 90.2  |
+| shooting      | 91.7      | 90.4  | 91.3  | 91.9  |
+| spiking       | 94.5      | 93.9  | 94.1  | 93.0  |
+| swing         | 94.6      | 94.1  | 92.5  | 91.7  |
+| tennis        | 95.9      | 94.1  | 94.1  | 93.3  |
+| walk          | 96.1      | 95.7  | 93.3  | 91.9  |
 
 The best accuracies were seen for 28 (20% motion vector and 80% static vector). 
 
@@ -154,8 +156,27 @@ The linear layer combining all hidden states of LSTM was omitted, and the final 
 
 *did not converge
 
+The first experiment was carried out for method 02 data as well. Time steps taken were 20 and model was fit to training data upto atleast 99%. 
+
+| Class         | 28        | 46    | 64    | 82    |
+| ------------- |:---------:| :----:| :---: | :---: |
+| biking        | 97.1      | 96.0  | 93.0  | 92.6  |
+| diving        | 93.9      | 90.6  | 90.0  | 89.7  |
+| golf          | 93.5      | 93.4  | 92.3  | 91.7  |
+| juggle        | 94.8      | 93.0  | 92.3  | 92.0  |
+| jumping       | 95.4      | 93.9  | 93.6  | 91.3  |
+| riding        | 97.0      | 96.0  | 91.7  | 90.2  |
+| shooting      | 92.1      | 91.0  | 90.4  | 91.4  |
+| spiking       | 94.3      | 94.3  | 94.1  | 93.2  |
+| swing         | 94.9      | 93.0  | 93.0  | 91.9  |
+| tennis        | 95.9      | 95.4  | 93.6  | 93.4  |
+| walk          | 97.2      | 95.6  | 94.7  | 93.9  |
+
+
+### Multi Class Classification
+
 Finally multi-class training was also carried out. This was done for the 28 dataset. Initally 20 time-steps were considered and training was done. The model was trained until it fit the training set upto 98.75% (convergence stopped at this point). An accuracy of 60.0% was recorded. 
-Next, the same was carried out considering 59 time-steps. Training was done until model fit training data 95.42% (convergence stopped afterwards). An accuracy of 62.826 was recorded. 
+Next, the same was carried out considering 59 time-steps. Training was done until model fit training data 95.42% (convergence stopped afterwards). An accuracy of 62.826 was recorded. This is for method 01 data. 
 
 | Class         | 28        |
 | ------------- |:---------:| 
