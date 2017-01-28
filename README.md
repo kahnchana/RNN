@@ -182,17 +182,17 @@ The static and motion vectors were turned into one dimension using PCA. The resu
 
 | Class         | PCA       |
 | ------------- |:---------:| 
-| biking        | 96.5      | 
-| diving        | 93.9      | 
-| golf          | 93.4      | 
-| juggle        | 92.4      | 
-| jumping       | *         | 
-| riding        | 97.4      | 
-| shooting      | 92.3      | 
-| spiking       | 93.4      | 
-| swing         | 94.1      | 
-| tennis        | 95.8      | 
-| walk          | *         |
+| biking        | 91.0      | 
+| diving        | 89.3      | 
+| golf          | 92.3      | 
+| juggle        | 92.8      | 
+| jumping       | 91.0      | 
+| riding        | 88.6      | 
+| shooting      | 90.6      | 
+| spiking       | 91.7      | 
+| swing         | 90.4      | 
+| tennis        | 93.0      | 
+| walk          | 93.4      |
 
 
 ### Multi Class Classification
