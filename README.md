@@ -212,12 +212,12 @@ The same was carried out for the method 02 data with same parameters. Model was 
 | 20 time-steps | 53.478    | 
 | 59 time-steps | 58.043    | 
 
-It was also carried out for the method 03 data with same parameters. 
+It was also carried out for the method 03 data with same parameters. Model was fit upto 98.13% to training data.
 
 | Class         | PCA       |
 | ------------- |:---------:| 
-| 20 time-steps | 53.478    | 
-| 59 time-steps | ------    | 
+| 20 time-steps | 38.043    | 
+| 59 time-steps | 46.304    | 
 
 ## References
 
