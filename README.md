@@ -1,5 +1,5 @@
 # RNN
-RNN will LSTM cells 
+RNN with LSTM cells 
 
 This basically takes a set of time-varying sequences and classifies these sequences. The sequence fed represents the motion and static vectors generated for the videos. 
 
